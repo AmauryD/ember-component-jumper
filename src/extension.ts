@@ -5,37 +5,50 @@ import * as Path from 'path';
 import kebabCase from '@queso/kebab-case';
 
 export const findEmberComponent = (type : string = 'component') => () => {
-	// The code you place here will be executed every time your command is executed
+	// if not workspaces , useless
 	if (!vscode.workspace.workspaceFolders) { return; }
 	
-	const basepath = vscode.workspace.workspaceFolders[0].uri.fsPath;
-
+	// take the first wp at the moment , if you have ideas to find the current workspace ...
+	const basepath : string = vscode.workspace.workspaceFolders[0].uri.fsPath;
 	const editor = vscode.window.activeTextEditor;
 
 	if (!editor) { return; } 
 
-	const text = editor.document.getText(editor.selection);
+	const text : string = editor.document.getText(editor.selection);
+	const parts : string[] = text.split("::"); // for namespaced components , delimiter is '::'
 
 	if (text) {
-		const emberCLIconfig = require(basepath + "/.ember-cli");
-		const kebabText = kebabCase(text);
-		let file;
+		let usePods : boolean;
+		let file : string;
 
-		if(emberCLIconfig.usePods === true) {
-			const fileName = type === "component" ? `template.hbs` : `component.js`;
-			file = Path.join(`${basepath}`,'app/pods/components',kebabText,fileName);
-		}else{
-			const extension = type === "component" ? `hbs` : `js`;
-			file = Path.join(`${basepath}`,'app/components',`${kebabText}.${extension}`);
+		try {
+			usePods = require(basepath + "/.ember-cli").usePods; // load 
+		}catch(e) {
+			usePods = false;
 		}
 
+		if(usePods) {
+			const fileName = type === "component" ? `template.hbs` : `component.js`;
+			file = Path.join(`${basepath}`,'app/pods/components',parts.map(p => kebabCase(p)).join('/'),fileName);
+		}else{
+			const extension : string = type === "component" ? `hbs` : `js`;
+			if (parts.length > 1) {
+				const last : string = parts.pop() as string; //never undefined
+				parts.map(p => kebabCase(p)).join('/');
+				file = Path.join(`${basepath}`,'app/components',parts.map(p => kebabCase(p)).join('/'),`${kebabCase(last)}.${extension}`);
+			}else{
+				file = Path.join(`${basepath}`,'app/components',`${kebabCase(text)}.${extension}`);
+			}
+		}
+
+		//open in workspace asynchronously
 		vscode.workspace.openTextDocument(vscode.Uri.parse("file:///" + file))
 			.then(
 			(doc) => {
 				vscode.window.showTextDocument(doc);
 			},
 			(err) => {
-				vscode.window.showErrorMessage(`Cannot find component ${kebabText}`);
+				vscode.window.showErrorMessage(`Cannot find component ${kebabCase(text)}`);
 			}
 		);
 	}
