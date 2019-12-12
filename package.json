@@ -3,6 +3,8 @@
 	"displayName": "ember-component-jumper",
 	"description": "jump to ember component file",
 	"version": "0.0.1",
+	"publisher" : "amauryd",
+	"repository":"https://github.com/AmauryD/ember-component-jumper.git",
 	"engines": {
 		"vscode": "^1.40.0"
 	},
