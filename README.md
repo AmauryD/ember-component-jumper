@@ -4,7 +4,7 @@ Ember addon to jum between components from selected text.
 
 ## Features
 
-![](github/example.png)
+![](github/example.PNG)
 
 Can open component class or template with right clicking on selected text.
 
