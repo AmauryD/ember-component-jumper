@@ -42,7 +42,7 @@ export const findEmberComponent = (type : string = 'component') => () => {
 		}
 
 		//open in workspace asynchronously
-		vscode.workspace.openTextDocument(vscode.Uri.parse("file:///" + file))
+		vscode.workspace.openTextDocument(file)
 			.then(
 			(doc) => {
 				vscode.window.showTextDocument(doc);
