@@ -14,44 +14,51 @@ export const findEmberComponent = (type : string = 'component') => () => {
 
 	if (!editor) { return; } 
 
-	const text : string = editor.document.getText(editor.selection);
+	let text : string;
+
+	if (editor.selection.isEmpty) {
+		const position = editor.selection.active;
+		const wordRange = editor.document.getWordRangeAtPosition(position);
+		text = editor.document.getText(wordRange);
+	}else{
+		text = editor.document.getText(editor.selection);
+	}
+
 	const parts : string[] = text.split("::"); // for namespaced components , delimiter is '::'
 
-	if (text) {
-		let usePods : boolean;
-		let file : string;
+	let usePods : boolean;
+	let file : string;
 
-		try {
-			usePods = require(basepath + "/.ember-cli").usePods; // load 
-		}catch(e) {
-			usePods = false;
-		}
-
-		if(usePods) {
-			const fileName = type === "component" ? `template.hbs` : `component.js`;
-			file = Path.join(`${basepath}`,'app/pods/components',parts.map(p => kebabCase(p)).join('/'),fileName);
-		}else{
-			const extension : string = type === "component" ? `hbs` : `js`;
-			if (parts.length > 1) {
-				const last : string = parts.pop() as string; //never undefined
-				parts.map(p => kebabCase(p)).join('/');
-				file = Path.join(`${basepath}`,'app/components',parts.map(p => kebabCase(p)).join('/'),`${kebabCase(last)}.${extension}`);
-			}else{
-				file = Path.join(`${basepath}`,'app/components',`${kebabCase(text)}.${extension}`);
-			}
-		}
-
-		//open in workspace asynchronously
-		vscode.workspace.openTextDocument(file)
-			.then(
-			(doc) => {
-				vscode.window.showTextDocument(doc);
-			},
-			(err) => {
-				vscode.window.showErrorMessage(`Cannot find component ${kebabCase(text)}`);
-			}
-		);
+	try {
+		usePods = require(basepath + "/.ember-cli").usePods; // load 
+	}catch(e) {
+		usePods = false;
 	}
+
+	if(usePods) {
+		const fileName = type === "component" ? `template.hbs` : `component.js`;
+		file = Path.join(`${basepath}`,'app/pods/components',parts.map(p => kebabCase(p)).join('/'),fileName);
+	}else{
+		const extension : string = type === "component" ? `hbs` : `js`;
+		if (parts.length > 1) {
+			const last : string = parts.pop() as string; //never undefined
+			parts.map(p => kebabCase(p)).join('/');
+			file = Path.join(`${basepath}`,'app/components',parts.map(p => kebabCase(p)).join('/'),`${kebabCase(last)}.${extension}`);
+		}else{
+			file = Path.join(`${basepath}`,'app/components',`${kebabCase(text)}.${extension}`);
+		}
+	}
+
+	//open in workspace asynchronously
+	vscode.workspace.openTextDocument(file)
+		.then(
+		(doc) => {
+			vscode.window.showTextDocument(doc);
+		},
+		(err) => {
+			vscode.window.showErrorMessage(`Cannot find component ${kebabCase(text)}`);
+		}
+	);
 };
 
 // this method is called when your extension is activated
