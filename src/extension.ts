@@ -18,7 +18,7 @@ export const findEmberComponent = (type : string = 'component') => () => {
 
 	if (editor.selection.isEmpty) {
 		const position = editor.selection.active;
-		const wordRange = editor.document.getWordRangeAtPosition(position);
+		const wordRange = editor.document.getWordRangeAtPosition(position,/[\w::]+/);
 		text = editor.document.getText(wordRange);
 	}else{
 		text = editor.document.getText(editor.selection);
