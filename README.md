@@ -12,12 +12,16 @@ Can open component class or template with right clicking on selected text.
 
 ## Future Goals 
 
-Full component navigation
-Inspection of external packages components
-Better classic/pods architecture detection and jump
+### Will do
 
-Show attributes of components ?
-Preview of component methods ?
+- Full component navigation
+- Inspection of external packages components
+- Better classic/pods architecture detection and jump
+
+### Possible
+
+- Show attributes of components
+- Preview of component methods
 
 ## Extension Settings
 
