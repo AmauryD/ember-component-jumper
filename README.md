@@ -1,5 +1,7 @@
 # ember-component-jumper
 
+**Archived**. Please use (Unstable) Ember Language server !
+
 Ember addon to jum between components from selected text.
 
 ## Features
